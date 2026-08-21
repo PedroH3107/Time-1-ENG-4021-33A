@@ -1,0 +1,8 @@
+def multiplicaf(x,y):
+     x*y= resultado
+    return resultado
+
+#BP 
+x=int(input ('Digite o número que você quer multiplicar'))
+y=int(input ('Digite o segundo número que você quer multiplicar'))
+print(multiplicaf(x,y))
