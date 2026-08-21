@@ -1,7 +1,0 @@
-import math
-
-def raiz_quadrada(numero):
-    return math.sqrt(numero)
-
-def raiz_cubica(numero):
-    return numero ** (1/3)
