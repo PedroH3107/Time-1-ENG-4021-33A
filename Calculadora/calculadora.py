@@ -52,9 +52,31 @@ def testeSubtrai():
     assert subtrai.subtraif(0, 5) == -5, "Erro: 0 - 5 deveria ser -5"
     assert subtrai.subtraif(5, 0) == 5, "Erro: 5 - 0 deveria ser 5"
     return
+def pergunta():
+    operacao = input("Qual operação você quer fazer? ")
+    num1 = float(input("Digite o primeiro número: "))
+    num2 = float(input("Digite o segundo número: "))
+ 
+    if operacao == "+":
+        resultado = somaf(num1, num2)
+    elif operacao == "-":
+        resultado = subtraif(num1, num2)
+    elif operacao == "*":
+        resultado = multiplicaf(num1, num2)
+    elif operacao == "/":
+        resultado = dividef(num1, num2)
+    elif operacao == "%":
+        resultado = restof(num1, num2)
+    else:
+        print("Operação inválida, tente novamente.")
+        return
+ 
+    print("Resultado:", resultado)
+
 testeSoma()
 testeMultiplicacao()
 testeResto()
 testeDivide()
 testeSubtrai()
 print("Todos os testes passaram com sucesso!")
+pergunta()
