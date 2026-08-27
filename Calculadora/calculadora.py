@@ -58,15 +58,15 @@ def pergunta():
     num2 = float(input("Digite o segundo número: "))
  
     if operacao == "+":
-        resultado = somaf(num1, num2)
+        resultado = soma.somaf(num1, num2)
     elif operacao == "-":
-        resultado = subtraif(num1, num2)
+        resultado = subtrai.subtraif(num1, num2)
     elif operacao == "*":
-        resultado = multiplicaf(num1, num2)
+        resultado = multiplicacao.multiplicaf(num1, num2)
     elif operacao == "/":
-        resultado = dividef(num1, num2)
+        resultado = divide.dividef(num1, num2)
     elif operacao == "%":
-        resultado = restof(num1, num2)
+        resultado = resto.restof(num1, num2)
     else:
         print("Operação inválida, tente novamente.")
         return
