@@ -1,0 +1,41 @@
+Para definir o um bom proposito ao nosso site, fiz um brainstorming de ideias possiveis.
+
+1)Plataforma de Agendamento de Artistas Locais: 
+Um serviço que conecta contratantes (eventos, bares, casamentos, empresas) a músicos, atores
+performers e artistas visuais da região para apresentações ou encomendas.
+
+2)Gerenciador e Portfólio para Museus Virtuais: Uma ferramenta onde pequenos museus, galerias
+ ou colecionadores independentes podem digitalizar seus acervos e criar exposições virtuais 
+ em 3D ou interativas.
+
+3)Mapeador Cultural da Cidade: Um mapa interativo que centraliza a agenda cultural local 
+(teatro, exposições, shows de rua, oficinas) e permite que produtores independentes divulguem
+ seus eventos gratuitamente.
+
+4)Clube de Assinatura de Arte Impressa: Um serviço mensal que envia aos assinantes tiragens
+ limitadas de gravuras, fotos ou ilustrações produzidas por artistas emergentes, acompanhadas
+  da história da obra.
+
+5)Banco de Talentos para Economia Criativa: Um marketplace focado exclusivamente em 
+profissionais da cultura, como cenógrafos, figurinistas, iluminadores, editores de som e 
+curadores.
+
+6)Plataforma de Pitching e Editais Culturais: Um site que agrega editais de fomento à 
+cultura abertos no país e oferece uma ferramenta para organizar e enviar propostas e 
+projetos culturais diretamente às bancas.
+
+7)Rede de Troca e Aluguel de Materiais Culturais: Um espaço para produtores e companhias 
+de teatro alugarem ou trocarem figurinos, instrumentos, equipamentos de som, iluminação e 
+peças de cenário sem uso.
+
+8)Plataforma de Mentorias Artísticas: Um serviço de agendamento de sessões individuais 
+online entre artistas iniciantes e profissionais experientes da indústria para revisão de 
+portfólio, análise de roteiro ou orientação de carreira.
+
+9)Guia de Acessibilidade Cultural Um diretório de espaços culturais e eventos avaliados 
+com base no nível de acessibilidade oferecido (libras, audiodescrição, rampas, espaço 
+sensorial para autistas).
+
+10)Central de Financiamento Coletivo de Obras Independentes Uma plataforma de crowdfunding 
+focada na produção de curta-metragens, álbuns musicais, peças de teatro e publicações de 
+livros de autores independentes.
