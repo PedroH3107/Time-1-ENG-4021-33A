@@ -1,0 +1,9 @@
+Requisitos Não-Funcionais
+1-O sistema deve estar disponível o tempo todo, evitando quedas
+2-As buscas devem ser rápidas, sem travamentos
+3-O sistema deve funcionar bem tanto em celular quanto em computador
+4-Os dados dos usuários devem ser mantidos em segurança, respeitando a LGPD
+5-O login deve ser seguro (senha ou autenticação via Google/redes sociais)
+6-O sistema deve suportar crescimento no número de usuários sem perder desempenho
+7-A interface deve ser simples e fácil de usar
+8-Os dados devem ter backup, evitando perdas em caso de falhas

@@ -1,0 +1,17 @@
+Requisitos Funcionais
+1-O sistema deve permitir que artistas se cadastrem, informando nome,
+categoria, portfólio, região de atuação e valores
+2-O sistema deve permitir o cadastro de contratantes (pessoas ou empresas)
+3-O sistema deve permitir buscar artistas por categoria (música, teatro, performance,
+artes visuais)
+4-O sistema deve permitir filtrar artistas por região/localização
+5-O perfil do artista deve exibir fotos, vídeos, descrição e disponibilidade
+6-O contratante deve poder enviar um pedido de agendamento ao artista
+7-O artista deve poder aceitar, recusar ou propor outra data/horário
+8-O sistema deve notificar os usuários sobre o status da solicitação (aceita, recusada,
+pendente)
+9-Após o evento, o contratante deve poder avaliar e comentar sobre o artista
+10-O perfil do artista deve exibir a média das avaliações recebidas
+11-O artista deve poder editar seu perfil e portfólio
+12-O sistema deve manter um histórico de agendamentos, tanto passados quanto futuros
+
