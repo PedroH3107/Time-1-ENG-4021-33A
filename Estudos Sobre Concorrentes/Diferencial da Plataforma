@@ -1,0 +1,16 @@
+Match Inteligente de Artistas
+O principal diferencial da nossa plataforma será o sistema de recomendação de artistas para eventos. 
+Em vez de o contratante precisar procurar manualmente entre diversos perfis, a plataforma ajudará a 
+encontrar as opções mais adequadas de forma rápida e organizada.
+Ao cadastrar um evento, o usuário informará algumas características básicas, como o tipo de evento, 
+localização, orçamento disponível e categoria artística desejada. A partir dessas informações, o sistema 
+analisará os artistas cadastrados e exibirá aqueles que apresentam maior compatibilidade com a solicitação.
+Essa recomendação será feita por meio de um sistema simples de pontuação. Artistas que estiverem disponíveis
+ na data, atuarem na categoria desejada, atenderem à faixa de preço informada e estiverem próximos da localização 
+ do evento receberão uma pontuação maior e aparecerão primeiro nos resultados.
+A escolha desse diferencial busca facilitar o processo de contratação tanto para os artistas quanto para os contratantes. 
+Além de economizar tempo na busca, o sistema aumenta as chances de encontrar profissionais adequados para cada ocasião. 
+Outro ponto importante é que essa funcionalidade pode ser implementada de forma relativamente simples, utilizando filtros e regras de classificação, 
+sem a necessidade de tecnologias complexas. Dessa forma, a plataforma oferece uma experiência mais eficiente e personalizada, destacando-se de 
+soluções que funcionam apenas como um catálogo de artistas.
+
