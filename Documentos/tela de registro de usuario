@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criar conta | ArtConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ede6d6;
+    --card: #f6f2ea;
+    --ink: #14100e;
+    --ink-soft: #6b6259;
+    --accent: #d0472a;
+    --accent-dark: #b23a20;
+    --line: #d9d0bd;
+    --error: #b3261e;
+    --ok: #2e7d4f;
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Topo */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Anton", sans-serif;
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .brand::before {
+    content: "";
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .topbar a.login {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* Conteúdo */
+  main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+  }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  .lead {
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+
+  /* Formulário */
+  form {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    padding: 26px 22px 24px;
+    display: grid;
+    gap: 20px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.03);
+  }
+
+  .field { display: grid; gap: 8px; }
+
+  label, legend {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  select {
+    width: 100%;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    transition: border-color .15s, box-shadow .15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' fill='none' stroke='%2314100e' stroke-width='2'%3E%3Cpath d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 42px;
+  }
+  input::placeholder { color: #a79e92; }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(208, 71, 42, .15);
+  }
+  input:user-invalid, select:user-invalid { border-color: var(--error); }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 560px) {
+    .row.two { grid-template-columns: 1fr 1fr; }
+  }
+
+  .hint {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+  .error-msg {
+    font-size: 0.8rem;
+    color: var(--error);
+    min-height: 1em;
+  }
+
+  /* Tipo de conta (cartões de rádio) */
+  fieldset { border: 0; display: grid; gap: 10px; }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice span {
+    display: block;
+    text-align: center;
+    padding: 14px 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: "Inter", sans-serif;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .choice small {
+    display: block;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .choice input:checked + span {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .choice input:checked + span small { color: #cfc6b4; }
+  .choice input:focus-visible + span { box-shadow: 0 0 0 4px rgba(208, 71, 42, .25); }
+
+  /* Campo extra para artistas */
+  #campo-categoria { display: none; }
+  #campo-categoria.visivel { display: grid; }
+
+  /* Senha */
+  .senha-wrap { position: relative; }
+  .senha-wrap button {
+    position: absolute;
+    right: 8px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 8px;
+    cursor: pointer;
+  }
+  .forca {
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .forca i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--error);
+    transition: width .2s, background .2s;
+  }
+
+  /* Checkbox */
+  .check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-family: "Inter", sans-serif;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .check input {
+    width: 20px; height: 20px;
+    margin-top: 2px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+  }
+  .check a { color: var(--accent); }
+
+  /* Botão */
+  .btn {
+    width: 100%;
+    font: inherit;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 999px;
+    padding: 17px 24px;
+    cursor: pointer;
+    transition: background .15s, transform .05s;
+  }
+  .btn:hover { background: var(--accent-dark); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+  .footer-note a { color: var(--ink); font-weight: 600; }
+
+  #sucesso {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #e3f1e8;
+    color: var(--ok);
+    font-weight: 500;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="/">ArtConnect</a>
+  <a class="login" href="/login">Entrar</a>
+</header>
+
+<main>
+  <p class="eyebrow">Criar conta</p>
+  <h1>Entre para a<br>ArtConnect</h1>
+  <p class="lead">Contrate talentos locais ou apresente o seu trabalho para quem procura artistas.</p>
+
+  <form id="form-cadastro" action="/api/cadastro" method="post" novalidate>
+
+    <fieldset>
+      <legend>Eu quero</legend>
+      <div class="choices">
+        <label class="choice">
+          <input type="radio" name="tipo" value="contratante" checked>
+          <span>Contratar<small>Tenho um evento</small></span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="tipo" value="artista">
+          <span>Ser contratado<small>Sou artista</small></span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <label for="nome">Nome completo</label>
+      <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Ex.: Maria Souza" required minlength="3">
+      <span class="error-msg" data-for="nome"></span>
+    </div>
+
+    <div class="field">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" autocomplete="email" placeholder="voce@email.com" required>
+      <span class="error-msg" data-for="email"></span>
+    </div>
+
+    <div class="row two">
+      <div class="field">
+        <label for="telefone">Telefone / WhatsApp</label>
+        <input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="tel" placeholder="(21) 99999-9999" required>
+        <span class="error-msg" data-for="telefone"></span>
+      </div>
+      <div class="field">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" name="cidade" autocomplete="address-level2" placeholder="Ex.: São Paulo" required>
+        <span class="error-msg" data-for="cidade"></span>
+      </div>
+    </div>
+
+    <div class="field" id="campo-categoria">
+      <label for="categoria">Categoria</label>
+      <select id="categoria" name="categoria">
+        <option value="">Selecione…</option>
+        <option>Chefs &amp; Buffet</option>
+        <option>Mágicos</option>
+        <option>DJs</option>
+        <option>Cantores</option>
+        <option>Foto &amp; Vídeo</option>
+      </select>
+      <span class="error-msg" data-for="categoria"></span>
+    </div>
+
+    <div class="field">
+      <label for="senha">Senha</label>
+      <div class="senha-wrap">
+        <input type="password" id="senha" name="senha" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" required minlength="8">
+        <button type="button" id="toggle-senha" aria-label="Mostrar ou ocultar senha">Mostrar</button>
+      </div>
+      <div class="forca" aria-hidden="true"><i id="forca-barra"></i></div>
+      <span class="error-msg" data-for="senha"></span>
+    </div>
+
+    <div class="field">
+      <label for="confirmar">Confirmar senha</label>
+      <input type="password" id="confirmar" name="confirmar" autocomplete="new-password" placeholder="Repita a senha" required>
+      <span class="error-msg" data-for="confirmar"></span>
+    </div>
+
+    <label class="check">
+      <input type="checkbox" name="termos" id="termos" required>
+      <span>Li e aceito os <a href="/termos">Termos de Uso</a> e a <a href="/privacidade">Política de Privacidade</a>.</span>
+    </label>
+    <span class="error-msg" data-for="termos"></span>
+
+    <button type="submit" class="btn">Criar conta</button>
+    <div id="sucesso" role="status">Conta criada com sucesso!</div>
+  </form>
+
+  <p class="footer-note">Já tem conta? <a href="/login">Entrar</a></p>
+</main>
+
+<script>
+  const form = document.getElementById('form-cadastro');
+  const campoCategoria = document.getElementById('campo-categoria');
+  const categoria = document.getElementById('categoria');
+  const senha = document.getElementById('senha');
+  const confirmar = document.getElementById('confirmar');
+  const barra = document.getElementById('forca-barra');
+
+  // Mostra "Categoria" só para artistas
+  document.querySelectorAll('input[name="tipo"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const artista = r.value === 'artista' && r.checked;
+      if (r.checked) {
+        campoCategoria.classList.toggle('visivel', artista);
+        categoria.required = artista;
+      }
+    });
+  });
+
+  // Mostrar/ocultar senha
+  document.getElementById('toggle-senha').addEventListener('click', e => {
+    const visivel = senha.type === 'text';
+    senha.type = confirmar.type = visivel ? 'password' : 'text';
+    e.target.textContent = visivel ? 'Mostrar' : 'Ocultar';
+  });
+
+  // Força da senha
+  senha.addEventListener('input', () => {
+    const v = senha.value;
+    let pts = 0;
+    if (v.length >= 8) pts++;
+    if (/[A-Z]/.test(v) && /[a-z]/.test(v)) pts++;
+    if (/\d/.test(v)) pts++;
+    if (/[^A-Za-z0-9]/.test(v)) pts++;
+    barra.style.width = (pts * 25) + '%';
+    barra.style.background = pts <= 1 ? '#b3261e' : pts <= 2 ? '#e0a21a' : '#2e7d4f';
+  });
+
+  // Máscara simples de telefone (BR)
+  document.getElementById('telefone').addEventListener('input', e => {
+    let d = e.target.value.replace(/\D/g, '').slice(0, 11);
+    if (d.length > 6) d = d.replace(/^(\d{2})(\d{4,5})(\d{0,4}).*/, '($1) $2-$3');
+    else if (d.length > 2) d = d.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    e.target.value = d;
+  });
+
+  function setErro(nome, msg) {
+    const el = document.querySelector(`.error-msg[data-for="${nome}"]`);
+    if (el) el.textContent = msg || '';
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    ['nome','email','telefone','cidade','categoria','senha','confirmar','termos'].forEach(n => setErro(n, ''));
+
+    const campos = {
+      nome: 'Informe seu nome completo.',
+      email: 'Informe um e-mail válido.',
+      telefone: 'Informe um telefone com DDD.',
+      cidade: 'Informe sua cidade.',
+    };
+    for (const [id, msg] of Object.entries(campos)) {
+      const el = document.getElementById(id);
+      if (!el.checkValidity() || !el.value.trim()) { setErro(id, msg); ok = false; }
+    }
+    if (categoria.required && !categoria.value) { setErro('categoria', 'Escolha uma categoria.'); ok = false; }
+    if (senha.value.length < 8) { setErro('senha', 'A senha precisa ter ao menos 8 caracteres.'); ok = false; }
+    if (confirmar.value !== senha.value) { setErro('confirmar', 'As senhas não coincidem.'); ok = false; }
+    if (!document.getElementById('termos').checked) { setErro('termos', 'É necessário aceitar os termos.'); ok = false; }
+
+    if (!ok) return;
+
+    // Aqui você envia os dados ao backend (ex.: fetch('/api/cadastro', { method: 'POST', body: new FormData(form) }))
+    document.getElementById('sucesso').style.display = 'block';
+  });
+</script>
+</body>
+</html>
