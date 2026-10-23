@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Avaliar artista{% endblock %}
+{% block largura %}narrow{% endblock %}
+
+{% block conteudo %}
+  <p class="eyebrow eyebrow--accent">Avaliação</p>
+  <h1 class="title title--md">Como foi com<br>{{ contrato.nome_artistico }}?</h1>
+  <p class="lead">{{ contrato.data_evento|data_br }} · {{ contrato.local }}. Sua nota aparece no perfil do artista e ajuda outros clientes.</p>
+
+  <form class="card form-grid" action="{{ url_for('avaliar_contrato', contrato_id=contrato.id) }}" method="post">
+    <fieldset>
+      <legend class="lbl">Nota</legend>
+      <div class="notas">
+        {% for n in ['1', '2', '3', '4', '5'] %}
+          <label>
+            <input type="radio" name="nota" value="{{ n }}" {% if form.get('nota') == n %}checked{% endif %} required>
+            <span>{{ n }}★</span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <div class="field">
+      <label class="lbl" for="comentario">Comentário (opcional)</label>
+      <textarea class="textarea" id="comentario" name="comentario" maxlength="500" placeholder="Pontualidade, qualidade, o que o público achou…">{{ form.get('comentario', '') }}</textarea>
+    </div>
+    <button class="btn btn--accent btn--block" type="submit">Enviar avaliação</button>
+  </form>
+{% endblock %}

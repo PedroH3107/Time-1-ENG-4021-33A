@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block titulo %}Dashboard{% endblock %}
+
+{% block conteudo %}
+  <p class="eyebrow">Administração</p>
+  <h1 class="title title--md">Dashboard da plataforma</h1>
+  <p class="lead">Uso e engajamento do ArtConnect, calculados direto do banco de dados.</p>
+
+  <div class="kpis">
+    <div class="kpi"><span class="lbl">Clientes</span><strong>{{ totais.clientes }}</strong><span>{{ totais.novos_30_dias }} contas novas em 30 dias</span></div>
+    <div class="kpi"><span class="lbl">Artistas ativos</span><strong>{{ totais.artistas_ativos }}</strong><span>{{ totais.contas_artista }} com login próprio</span></div>
+    <div class="kpi"><span class="lbl">Pedidos</span><strong>{{ totais.pedidos }}</strong><span>{{ totais.propostas }} propostas recebidas</span></div>
+    <div class="kpi"><span class="lbl">Conversão</span><strong>{{ conversao }}%</strong><span>pedidos que viraram contrato</span></div>
+    <div class="kpi"><span class="lbl">Volume contratado</span><strong>{{ totais.volume|moeda }}</strong><span>{{ totais.contratos }} contratos</span></div>
+    <div class="kpi"><span class="lbl">Valor retido</span><strong>{{ totais.retido|moeda }}</strong><span>aguardando confirmação</span></div>
+    <div class="kpi"><span class="lbl">Nota média</span><strong>{{ totais.nota_media or "—" }}</strong><span>{{ totais.avaliacoes }} avaliações</span></div>
+  </div>
+
+  <h2 class="section-title">Demanda por categoria</h2>
+  <div class="card" style="margin-bottom: 32px">
+    <div class="legenda"><span><i style="background: var(--accent)"></i>Pedidos</span><span><i style="background: var(--ink)"></i>Contratos</span></div>
+    <div class="barras">
+      {% for c in categorias %}
+        <div class="barra">
+          <span>{{ c.nome }}</span>
+          <div class="trilho" role="img" aria-label="{{ c.nome }}: {{ c.pedidos }} pedidos e {{ c.contratos }} contratos">
+            <div class="cheio" style="width: {{ (c.pedidos / maior * 100)|round(1) }}%"></div>
+            <div class="cheio cheio--escuro" style="width: {{ (c.contratos / maior * 100)|round(1) }}%"></div>
+          </div>
+          <span>{{ c.pedidos }} · {{ c.contratos }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="duas-colunas">
+    <div>
+      <h2 class="section-title">Pedidos por status</h2>
+      <div class="lista">
+        {% for s in pedidos_por_status %}
+          <div class="item"><h3>{{ s.status|replace('_', ' ') }}</h3><span class="valor">{{ s.total }}</span></div>
+        {% else %}
+          <p class="vazio">Nenhum pedido ainda.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <h2 class="section-title">Contratos por status</h2>
+      <div class="lista">
+        {% for s in contratos_por_status %}
+          <div class="item"><h3>{{ s.status|status_contrato }}</h3><span class="valor">{{ s.total }}</span></div>
+        {% else %}
+          <p class="vazio">Nenhum contrato ainda.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Artistas mais bem avaliados</h2>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Artista</th><th>Categoria</th><th>Nota</th><th>Avaliações</th></tr></thead>
+      <tbody>
+        {% for r in ranking %}
+          <tr><td>{{ r.nome_artistico }}</td><td>{{ r.categoria }}</td><td>★ {{ r.nota_media }}</td><td>{{ r.total_avaliacoes }}</td></tr>
+        {% else %}
+          <tr><td colspan="4">Nenhuma avaliação ainda.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

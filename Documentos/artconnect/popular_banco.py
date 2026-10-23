@@ -89,6 +89,7 @@ def popular():
         ("luiz", "Ateliê Aurora", "outro", "Painel ao vivo", "2026-05-30", "Praça das Artes, São Paulo", 1980, "concluido", "liberado", 5, "Painel lindo, todo mundo parou para ver."),
         ("helena", "Selva Ritmo", "casamento", "Set de 4 horas", "2026-09-20", "Espaço Jardim Ipê, São Paulo", 4800, "concluido", "liberado", 5, "Chegaram uma hora antes para passagem de som. A pista não esvaziou."),
         ("rafael", "Coletivo Maré", "corporativo", "Quinteto", "2026-09-10", "Hotel Vila Nova, Rio de Janeiro", 6500, "concluido", "liberado", 4, "Banda muito bem ensaiada, atrasou alguns minutos na montagem."),
+        ("luiz", "Estúdio Lume", "formatura", "Cobertura de foto e vídeo", "2026-08-15", "Clube Monte Líbano, Rio de Janeiro", 2200, "concluido", "liberado", None, None),
     ]
     for item in contratos:
         cursor.execute(
@@ -131,6 +132,64 @@ def popular():
             "((SELECT id FROM profiles WHERE username = 'selvaritmo'), "
             "(SELECT id FROM profiles WHERE username = 'luiz'), %s)",
             (texto,),
+        )
+
+    print("Inserindo pedidos de orçamento, propostas e agenda dos artistas...")
+    # (cliente, slug_categoria, tipo, data, horario, duracao, convidados, local, observacoes)
+    pedidos = [
+        ("luiz", "djs", "casamento", "2026-12-12", "20:00", 4, 150, "Casa de Festas Lagoa, Rio de Janeiro", "Pista com house e MPB remix."),
+        ("helena", "cantores", "aniversario", "2026-11-28", "19:00", 3, 60, "Salão Vila Madalena, São Paulo", "Voz e violão no jantar."),
+        ("rafael", "djs", "corporativo", "2026-12-05", "21:00", 5, 200, "Rooftop Centro, Rio de Janeiro", None),
+    ]
+    for item in pedidos:
+        cursor.execute(
+            "INSERT INTO eventos (cliente_id, tipo, categoria_id, data_evento, localizacao) "
+            "VALUES ((SELECT id FROM profiles WHERE username = %s), %s, "
+            "(SELECT id FROM categorias WHERE slug = %s), %s, %s) RETURNING id",
+            (item[0], item[2], item[1], item[3], item[7]),
+        )
+        evento_id = cursor.fetchone()["id"]
+        cursor.execute(
+            "INSERT INTO pedidos_orcamento (evento_id, categoria_id, data_evento, horario_inicio, "
+            "duracao_horas, estimativa_convidados, local, observacoes) "
+            "VALUES (%s, (SELECT id FROM categorias WHERE slug = %s), %s, %s, %s, %s, %s, %s)",
+            (evento_id, item[1], item[3], item[4], item[5], item[6], item[7], item[8]),
+        )
+
+    # Duas respostas ao pedido do luiz: uma proposta normal e uma contraproposta de data
+    cursor.execute(
+        "INSERT INTO propostas (pedido_id, artista_id, valor, mensagem) VALUES ("
+        "(SELECT po.id FROM pedidos_orcamento po JOIN eventos e ON e.id = po.evento_id "
+        " JOIN profiles p ON p.id = e.cliente_id WHERE p.username = 'luiz' AND po.status = 'aberto'), "
+        "(SELECT id FROM artistas WHERE nome_artistico = 'Selva Ritmo'), 2800, "
+        "'Levo som e iluminação. Set de 4 horas com house e brasilidades.')"
+    )
+    cursor.execute(
+        "INSERT INTO propostas (pedido_id, artista_id, valor, mensagem, data_sugerida) VALUES ("
+        "(SELECT po.id FROM pedidos_orcamento po JOIN eventos e ON e.id = po.evento_id "
+        " JOIN profiles p ON p.id = e.cliente_id WHERE p.username = 'luiz' AND po.status = 'aberto'), "
+        "(SELECT id FROM artistas WHERE nome_artistico = 'Neon Sombra'), 3100, "
+        "'No dia 12 já tenho show. Consigo no dia seguinte, mesmo horário.', '2026-12-13')"
+    )
+    cursor.execute(
+        "UPDATE pedidos_orcamento SET status = 'com_propostas' WHERE id = "
+        "(SELECT po.id FROM pedidos_orcamento po JOIN eventos e ON e.id = po.evento_id "
+        " JOIN profiles p ON p.id = e.cliente_id WHERE p.username = 'luiz' AND po.status = 'aberto')"
+    )
+
+    # (artista, data, status, observacao)
+    agenda = [
+        ("Selva Ritmo", "2026-11-21", "ocupado", "Show particular"),
+        ("Selva Ritmo", "2026-12-05", "ocupado", "Festival em Campinas"),
+        ("Neon Sombra", "2026-12-12", "ocupado", "Show já fechado"),
+        ("Coletivo Maré", "2026-11-29", "ocupado", "Viagem"),
+        ("Coletivo Maré", "2026-12-20", "disponivel", "Aceita evento de fim de ano"),
+    ]
+    for item in agenda:
+        cursor.execute(
+            "INSERT INTO disponibilidade (artista_id, data, status, observacao) VALUES "
+            "((SELECT id FROM artistas WHERE nome_artistico = %s), %s, %s, %s)",
+            item,
         )
 
     conexao.commit()

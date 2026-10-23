@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}Esqueci a senha{% endblock %}
+{% block main_class %}main--center{% endblock %}
+{% block largura %}narrow{% endblock %}
+
+{% block conteudo %}
+  <p class="eyebrow">Recuperar acesso</p>
+  <h1 class="title">Esqueceu<br>a senha?</h1>
+  <p class="lead">Informe o e-mail da sua conta. Enviamos um link para você criar uma senha nova.</p>
+
+  <form class="card card--dark form-grid" action="{{ url_for('esqueci_senha') }}" method="post">
+    <div class="field">
+      <label class="lbl" for="email">E-mail</label>
+      <input class="input" id="email" name="email" type="email" value="{{ email }}" placeholder="voce@exemplo.com" autocomplete="email" required>
+    </div>
+    <button class="btn btn--accent btn--block" type="submit">Enviar link</button>
+    <p class="below">Lembrou? <a href="{{ url_for('login') }}">Voltar para o login</a></p>
+  </form>
+{% endblock %}

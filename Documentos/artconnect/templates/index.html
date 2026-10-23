@@ -14,7 +14,9 @@
         <option value="{{ cat.id }}" {% if categoria_atual == cat.id|string %}selected{% endif %}>{{ cat.nome }}</option>
       {% endfor %}
     </select>
-    <input class="input" type="text" name="cidade" value="{{ cidade_atual }}" placeholder="Cidade (ex.: Rio de Janeiro)" aria-label="Cidade">
+    <input class="input" type="text" name="cidade" value="{{ cidade_atual }}" placeholder="Cidade do evento" aria-label="Cidade do evento">
+    <input class="input" type="text" inputmode="decimal" name="orcamento" value="{{ orcamento_atual }}" placeholder="Orçamento (R$)" aria-label="Orçamento em reais">
+    <input class="input" type="date" name="data" value="{{ data_atual }}" aria-label="Data do evento">
     <button class="btn btn--accent" type="submit">Encontrar artistas</button>
   </form>
 
@@ -26,14 +28,22 @@
     {% endfor %}
   </div>
 
-  <h2 class="section-title">Talentos mais bem avaliados</h2>
+  {% if usar_match %}
+    <h2 class="section-title">Mais compatíveis com seu evento</h2>
+    <p class="hint" style="margin: -8px 0 20px">Ordenados por preço dentro do orçamento, cidade, agenda livre na data e avaliação.</p>
+  {% else %}
+    <h2 class="section-title">Talentos mais bem avaliados</h2>
+  {% endif %}
   {% if artistas %}
     <div class="grid-artistas">
       {% for artista in artistas %}
         <a class="artista" href="{{ url_for('artista_detalhe', artista_id=artista.id) }}">
+          {% if usar_match %}
+            <span class="match {% if artista.compatibilidade >= 80 %}match--alta{% elif artista.compatibilidade < 50 %}match--baixa{% endif %}">{{ artista.compatibilidade }}% compatível</span>
+          {% endif %}
           <span class="cat">{{ artista.categoria }}{% if artista.estilo %} · {{ artista.estilo }}{% endif %}</span>
           <h3>{{ artista.nome_artistico }}</h3>
-          <span class="cidade">{{ artista.cidade }}</span>
+          <span class="cidade">{{ artista.cidade }}{% if usar_match and data_atual and artista.ocupado %} · ocupado na data{% endif %}</span>
           <div class="rodape">
             <span class="nota">
               {% if artista.nota_media %}★ {{ artista.nota_media }} ({{ artista.total_avaliacoes }}){% else %}Novo{% endif %}

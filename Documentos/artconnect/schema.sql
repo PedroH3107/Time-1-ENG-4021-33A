@@ -6,12 +6,13 @@
 
 DROP VIEW  IF EXISTS vw_painel_cliente;
 DROP VIEW  IF EXISTS vw_artistas;
-DROP TABLE IF EXISTS chamados_suporte, mensagens, avaliacoes, pagamentos,
-                     contratos, propostas, pedidos_orcamento, eventos,
-                     artistas, categorias, profiles CASCADE;
+DROP TABLE IF EXISTS tokens_senha, disponibilidade, chamados_suporte,
+                     mensagens, avaliacoes, pagamentos, contratos, propostas,
+                     pedidos_orcamento, eventos, artistas, categorias,
+                     profiles CASCADE;
 DROP TYPE  IF EXISTS papel_usuario, tipo_evento, status_orcamento,
                      status_proposta, status_contrato, status_pagamento,
-                     status_suporte CASCADE;
+                     status_suporte, status_agenda CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
@@ -19,10 +20,12 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TYPE papel_usuario    AS ENUM ('cliente', 'artista', 'admin');
 CREATE TYPE tipo_evento      AS ENUM ('casamento', 'corporativo', 'aniversario', 'formatura', 'outro');
 CREATE TYPE status_orcamento AS ENUM ('aberto', 'com_propostas', 'fechado', 'cancelado');
-CREATE TYPE status_proposta  AS ENUM ('enviada', 'aceita', 'recusada');
+-- enviada/aceita/recusada: decisão do cliente; declinada: o artista recusou o pedido
+CREATE TYPE status_proposta  AS ENUM ('enviada', 'aceita', 'recusada', 'declinada');
 CREATE TYPE status_contrato  AS ENUM ('aguardando_pagamento', 'valor_retido', 'concluido', 'cancelado');
 CREATE TYPE status_pagamento AS ENUM ('pendente', 'retido', 'liberado', 'reembolsado');
 CREATE TYPE status_suporte   AS ENUM ('aberto', 'em_andamento', 'resolvido');
+CREATE TYPE status_agenda    AS ENUM ('disponivel', 'ocupado');
 
 -- ---------- USUÁRIOS ----------
 CREATE TABLE profiles (
@@ -93,12 +96,15 @@ CREATE TABLE pedidos_orcamento (
 CREATE TABLE propostas (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pedido_id   UUID NOT NULL REFERENCES pedidos_orcamento(id) ON DELETE CASCADE,
-    artista_id  UUID NOT NULL REFERENCES artistas(id),
-    valor       NUMERIC(10,2) NOT NULL CHECK (valor >= 0),
+    artista_id  UUID NOT NULL REFERENCES artistas(id) ON DELETE CASCADE,
+    valor       NUMERIC(10,2) CHECK (valor >= 0),
     mensagem    TEXT,
+    data_sugerida     DATE,          -- preenchida quando é contraproposta de data
+    horario_sugerido  TIME,          -- preenchido quando é contraproposta de horário
     status      status_proposta NOT NULL DEFAULT 'enviada',
     criado_em   TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (pedido_id, artista_id)
+    UNIQUE (pedido_id, artista_id),
+    CHECK (status = 'declinada' OR valor IS NOT NULL)
 );
 
 -- ---------- CONTRATOS ----------
@@ -160,6 +166,29 @@ CREATE TABLE chamados_suporte (
     assunto     TEXT NOT NULL,
     descricao   TEXT NOT NULL,
     status      status_suporte NOT NULL DEFAULT 'aberto',
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ---------- AGENDA DO ARTISTA ----------
+CREATE TABLE disponibilidade (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    artista_id  UUID NOT NULL REFERENCES artistas(id) ON DELETE CASCADE,
+    data        DATE NOT NULL,
+    status      status_agenda NOT NULL DEFAULT 'ocupado',
+    observacao  TEXT CHECK (char_length(observacao) <= 120),
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (artista_id, data)
+);
+CREATE INDEX idx_disponibilidade_data ON disponibilidade (data, status);
+
+-- ---------- RECUPERAÇÃO DE SENHA ----------
+-- Guarda só o hash do token; o token em si vai apenas no link enviado por e-mail
+CREATE TABLE tokens_senha (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    token_hash  TEXT NOT NULL UNIQUE,
+    expira_em   TIMESTAMPTZ NOT NULL,
+    usado       BOOLEAN NOT NULL DEFAULT FALSE,
     criado_em   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

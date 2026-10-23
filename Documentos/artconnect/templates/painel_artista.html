@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block titulo %}Painel do artista{% endblock %}
+
+{% block conteudo %}
+  <p class="eyebrow eyebrow--accent">Painel do artista · {{ artista.categoria }}</p>
+  <h1 class="title title--md">{{ artista.nome_artistico }}</h1>
+  <p class="lead">Pedidos da sua categoria, propostas enviadas, agenda e avaliações em um só lugar.</p>
+
+  <div class="kpis">
+    <div class="kpi"><span class="lbl">Pedidos novos</span><strong>{{ pedidos|length }}</strong><span>esperando sua resposta</span></div>
+    <div class="kpi"><span class="lbl">Propostas</span><strong>{{ aguardando }}</strong><span>aguardando o cliente</span></div>
+    <div class="kpi"><span class="lbl">Próximos shows</span><strong>{{ contratos|length }}</strong><span>contratos fechados</span></div>
+    <div class="kpi"><span class="lbl">Nota geral</span><strong>{{ artista.nota_media or "—" }}</strong><span>{{ artista.total_avaliacoes }} avaliações</span></div>
+  </div>
+
+  <nav class="tabs" aria-label="Seções do painel">
+    <a class="tab {% if aba == 'pedidos' %}ativo{% endif %}" href="{{ url_for('artista_painel', aba='pedidos') }}">
+      Pedidos{% if pedidos %}<span class="badge">{{ pedidos|length }}</span>{% endif %}
+    </a>
+    <a class="tab {% if aba == 'propostas' %}ativo{% endif %}" href="{{ url_for('artista_painel', aba='propostas') }}">Minhas propostas</a>
+    <a class="tab {% if aba == 'agenda' %}ativo{% endif %}" href="{{ url_for('artista_painel', aba='agenda') }}">Agenda</a>
+    <a class="tab {% if aba == 'avaliacoes' %}ativo{% endif %}" href="{{ url_for('artista_painel', aba='avaliacoes') }}">Avaliações</a>
+  </nav>
+
+  {% if aba == 'pedidos' %}
+    <h2 class="section-title">Pedidos de orçamento</h2>
+    {% if pedidos %}
+      <div class="lista">
+        {% for p in pedidos %}
+          <div class="item item--bloco">
+            <div class="item__topo">
+              <div>
+                <h3>{{ p.tipo|tipo_evento }} · {{ p.cliente.split(' ')[0] }}</h3>
+                <p>{{ p.data_evento|data_br }} às {{ p.horario_inicio.strftime('%H:%M') }} · {{ p.duracao_horas|round|int }}h · {{ p.estimativa_convidados }} convidados</p>
+                <p>{{ p.local }}</p>
+                {% if p.observacoes %}<p>“{{ p.observacoes }}”</p>{% endif %}
+              </div>
+              <span class="status">{{ p.status|replace('_', ' ') }}</span>
+            </div>
+            {% if p.conflito %}
+              <p class="alerta">Sua agenda está marcada como ocupada nesse dia. Envie uma contraproposta com outra data.</p>
+            {% endif %}
+
+            <div class="resposta">
+              {% if not p.conflito %}
+                <form class="form-grid" action="{{ url_for('responder_pedido', pedido_id=p.id) }}" method="post">
+                  <input type="hidden" name="acao" value="proposta">
+                  <div class="linha">
+                    <div class="field">
+                      <label class="lbl" for="valor-{{ p.id }}">Valor (R$)</label>
+                      <input class="input" id="valor-{{ p.id }}" name="valor" inputmode="decimal" placeholder="a partir de {{ artista.preco_minimo|moeda }}" required>
+                    </div>
+                    <div class="field">
+                      <label class="lbl" for="msg-{{ p.id }}">Mensagem</label>
+                      <input class="input" id="msg-{{ p.id }}" name="mensagem" maxlength="500" placeholder="O que está incluso">
+                    </div>
+                  </div>
+                  <button class="btn btn--accent btn--small" type="submit">Enviar proposta</button>
+                </form>
+              {% endif %}
+
+              <details {% if p.conflito %}open{% endif %}>
+                <summary>Propor outra data ou horário</summary>
+                <form class="form-grid" style="margin-top: 12px" action="{{ url_for('responder_pedido', pedido_id=p.id) }}" method="post">
+                  <input type="hidden" name="acao" value="contraproposta">
+                  <div class="linha">
+                    <div class="field">
+                      <label class="lbl" for="data-{{ p.id }}">Nova data</label>
+                      <input class="input" type="date" id="data-{{ p.id }}" name="data_sugerida" min="{{ hoje }}" required>
+                    </div>
+                    <div class="field">
+                      <label class="lbl" for="hora-{{ p.id }}">Novo horário (opcional)</label>
+                      <input class="input" type="time" id="hora-{{ p.id }}" name="horario_sugerido">
+                    </div>
+                  </div>
+                  <div class="linha">
+                    <div class="field">
+                      <label class="lbl" for="cvalor-{{ p.id }}">Valor (R$)</label>
+                      <input class="input" id="cvalor-{{ p.id }}" name="valor" inputmode="decimal" required>
+                    </div>
+                    <div class="field">
+                      <label class="lbl" for="cmsg-{{ p.id }}">Mensagem</label>
+                      <input class="input" id="cmsg-{{ p.id }}" name="mensagem" maxlength="500" placeholder="Por que a outra data">
+                    </div>
+                  </div>
+                  <button class="btn btn--dark btn--small" type="submit">Enviar contraproposta</button>
+                </form>
+              </details>
+
+              <form action="{{ url_for('responder_pedido', pedido_id=p.id) }}" method="post">
+                <input type="hidden" name="acao" value="recusar">
+                <button class="btn btn--ghost btn--small" type="submit">Recusar pedido</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="vazio">Nenhum pedido novo na sua categoria agora.</p>
+    {% endif %}
+
+  {% elif aba == 'propostas' %}
+    <h2 class="section-title">Minhas propostas</h2>
+    {% if propostas %}
+      <div class="lista">
+        {% for pr in propostas %}
+          <div class="item">
+            <div>
+              <h3>{{ pr.tipo|tipo_evento }} · {{ pr.cliente.split(' ')[0] }}</h3>
+              <p>{{ (pr.data_sugerida or pr.data_evento)|data_br }}{% if pr.data_sugerida %} (contraproposta; pedido era {{ pr.data_evento|data_br }}){% endif %} · {{ pr.local }}</p>
+            </div>
+            <div class="acoes">
+              {% if pr.valor %}<span class="valor">{{ pr.valor|moeda }}</span>{% endif %}
+              <span class="status {% if pr.status == 'aceita' %}status--liberado{% elif pr.status == 'enviada' %}status--pendente{% endif %}">{{ pr.status|status_proposta }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="vazio">Você ainda não respondeu nenhum pedido.</p>
+    {% endif %}
+
+  {% elif aba == 'agenda' %}
+    <div class="duas-colunas">
+      <div>
+        <h2 class="section-title">Marcar data</h2>
+        <form class="card form-grid" action="{{ url_for('atualizar_agenda') }}" method="post">
+          <div class="field">
+            <label class="lbl" for="data">Data</label>
+            <input class="input" type="date" id="data" name="data" min="{{ hoje }}" required>
+          </div>
+          <div class="field">
+            <label class="lbl" for="status">Situação</label>
+            <select class="select" id="status" name="status">
+              <option value="ocupado">Ocupado (não recebo pedidos)</option>
+              <option value="disponivel">Disponível (quero ser contratado)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl" for="observacao">Observação</label>
+            <input class="input" id="observacao" name="observacao" maxlength="120" placeholder="Ex.: show em outra cidade">
+          </div>
+          <button class="btn btn--accent" type="submit">Salvar na agenda</button>
+        </form>
+      </div>
+      <div>
+        <h2 class="section-title">Próximos shows</h2>
+        {% if contratos %}
+          <div class="lista">
+            {% for c in contratos %}
+              <div class="item">
+                <div>
+                  <h3>{{ c.data_evento|data_br }}</h3>
+                  <p>{{ c.tipo|tipo_evento }} · {{ c.cliente }} · {{ c.local }}</p>
+                </div>
+                <span class="status">{{ c.status|status_contrato }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="vazio">Nenhum show marcado.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <h2 class="section-title">Datas marcadas</h2>
+    {% if agenda %}
+      <div class="lista">
+        {% for d in agenda %}
+          <div class="item">
+            <div>
+              <h3>{{ d.data|data_br }}</h3>
+              <p>{{ d.observacao or "Sem observação" }}</p>
+            </div>
+            <div class="acoes">
+              <span class="status {% if d.status == 'ocupado' %}status--retido{% else %}status--liberado{% endif %}">{{ d.status }}</span>
+              <form action="{{ url_for('atualizar_agenda') }}" method="post">
+                <input type="hidden" name="acao" value="remover">
+                <input type="hidden" name="data" value="{{ d.data.isoformat() }}">
+                <button class="btn btn--ghost btn--small" type="submit">Remover</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="vazio">Nenhuma data marcada. Sem marcação, você aparece como livre para qualquer data.</p>
+    {% endif %}
+
+  {% elif aba == 'avaliacoes' %}
+    <h2 class="section-title">O que os clientes disseram</h2>
+    {% if avaliacoes %}
+      <div class="depoimentos">
+        {% for av in avaliacoes %}
+          <blockquote class="depoimento">
+            <span class="estrelas" aria-label="Nota {{ av.nota }} de 5">{% for i in range(av.nota) %}★{% endfor %}</span>
+            <p>“{{ av.comentario or "Sem comentário." }}”</p>
+            <footer>{{ av.cliente }} · {{ av.criado_em|data_br }}</footer>
+          </blockquote>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="vazio">Você ainda não recebeu avaliações.</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}
