@@ -50,3 +50,21 @@ def executar(sql, parametros=(), retornar=False):
         raise
     finally:
         conexao.close()
+
+
+def transacao(comandos):
+    """Executa uma lista de (sql, parametros) numa única transação.
+
+    Ou todos os comandos são gravados, ou nenhum é (rollback em caso de erro).
+    """
+    conexao = conectar()
+    try:
+        cursor = conexao.cursor()
+        for comando in comandos:
+            cursor.execute(comando[0], comando[1])
+        conexao.commit()
+    except Exception:
+        conexao.rollback()
+        raise
+    finally:
+        conexao.close()

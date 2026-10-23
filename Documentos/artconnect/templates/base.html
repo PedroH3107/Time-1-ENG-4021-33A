@@ -16,13 +16,19 @@
     <nav class="nav" aria-label="Navegação principal">
       <a class="link" href="{{ url_for('index') }}">Artistas</a>
       {% if usuario_nome %}
-        <a class="link" href="{{ url_for('painel') }}">Meu painel</a>
-        <a class="link" href="{{ url_for('editar_perfil') }}">Perfil</a>
-        {% if usuario_papel == 'admin' %}
+        {% if usuario_papel == 'artista' %}
+          <a class="link" href="{{ url_for('artista_painel') }}">Meu painel</a>
+        {% elif usuario_papel == 'admin' %}
+          <a class="link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
           <a class="link" href="{{ url_for('listar_usuarios') }}">Usuários</a>
+        {% else %}
+          <a class="link" href="{{ url_for('painel') }}">Meu painel</a>
         {% endif %}
+        <a class="link" href="{{ url_for('editar_perfil') }}">Perfil</a>
         <a class="link" href="{{ url_for('logout') }}">Sair</a>
-        <a class="btn btn--dark" href="{{ url_for('orcamento') }}">Pedir orçamento</a>
+        {% if usuario_papel == 'cliente' %}
+          <a class="btn btn--dark" href="{{ url_for('orcamento') }}">Pedir orçamento</a>
+        {% endif %}
       {% else %}
         <a class="link" href="{{ url_for('login') }}">Entrar</a>
         <a class="btn btn--dark" href="{{ url_for('cadastro') }}">Criar conta</a>

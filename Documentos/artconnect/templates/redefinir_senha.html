@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Nova senha{% endblock %}
+{% block main_class %}main--center{% endblock %}
+{% block largura %}narrow{% endblock %}
+
+{% block conteudo %}
+  <p class="eyebrow">Recuperar acesso</p>
+  <h1 class="title">Crie uma<br>senha nova</h1>
+  <p class="lead">Use pelo menos 8 caracteres. O link vale uma única vez.</p>
+
+  <form class="card card--dark form-grid" action="{{ url_for('redefinir_senha', token=token) }}" method="post">
+    <div class="field">
+      <label class="lbl" for="senha">Nova senha</label>
+      <input class="input" id="senha" name="senha" type="password" minlength="8" autocomplete="new-password" required>
+    </div>
+    <div class="field">
+      <label class="lbl" for="confirmar">Repita a senha</label>
+      <input class="input" id="confirmar" name="confirmar" type="password" minlength="8" autocomplete="new-password" required>
+    </div>
+    <button class="btn btn--accent btn--block" type="submit">Salvar nova senha</button>
+  </form>
+{% endblock %}

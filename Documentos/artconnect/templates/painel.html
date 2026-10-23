@@ -32,8 +32,19 @@
               <h3>{{ c.nome_artistico }}</h3>
               <p>{{ c.descricao or c.estilo }} · {{ c.tipo|tipo_evento }}</p>
               <p>{{ c.data_evento|data_br }} · {{ c.local }}</p>
+              <p><span class="status">{{ c.status|status_contrato }}</span>
+                {% if c.minha_nota %} <span class="estrelas" aria-label="Sua nota: {{ c.minha_nota }} de 5">{% for i in range(c.minha_nota) %}★{% endfor %}</span>{% endif %}</p>
             </div>
-            <span class="valor">{{ c.valor_total|moeda }}</span>
+            <div class="acoes">
+              <span class="valor">{{ c.valor_total|moeda }}</span>
+              {% if c.status == 'valor_retido' and c.ja_aconteceu %}
+                <form action="{{ url_for('confirmar_evento', contrato_id=c.id) }}" method="post">
+                  <button class="btn btn--dark btn--small" type="submit">Confirmar que o evento aconteceu</button>
+                </form>
+              {% elif c.status == 'concluido' and not c.avaliacao_id %}
+                <a class="btn btn--accent btn--small" href="{{ url_for('avaliar_contrato', contrato_id=c.id) }}">Avaliar artista</a>
+              {% endif %}
+            </div>
           </div>
         {% endfor %}
       </div>
@@ -68,13 +79,40 @@
     {% if pedidos %}
       <div class="lista">
         {% for p in pedidos %}
-          <div class="item">
-            <div>
-              <h3>{{ p.categoria }}</h3>
-              <p>{{ p.tipo|tipo_evento }} · {{ p.data_evento|data_br }} às {{ p.horario_inicio.strftime('%H:%M') }} · {{ p.estimativa_convidados }} convidados</p>
-              <p>{{ p.local }}</p>
+          <div class="item item--bloco">
+            <div class="item__topo">
+              <div>
+                <h3>{{ p.categoria }}</h3>
+                <p>{{ p.tipo|tipo_evento }} · {{ p.data_evento|data_br }} às {{ p.horario_inicio.strftime('%H:%M') }} · {{ p.estimativa_convidados }} convidados</p>
+                <p>{{ p.local }}</p>
+              </div>
+              <span class="status">{{ p.status|replace('_', ' ') }}</span>
             </div>
-            <span class="status">{{ p.status|replace('_', ' ') }}</span>
+            {% set ns = namespace(tem=false) %}
+            {% for pr in propostas if pr.pedido_id == p.id %}
+              {% set ns.tem = true %}
+              <div class="proposta">
+                <div>
+                  <strong><a href="{{ url_for('artista_detalhe', artista_id=pr.artista_id) }}">{{ pr.nome_artistico }}</a></strong>
+                  · {{ pr.valor|moeda }}
+                  {% if pr.data_sugerida %}<span class="status status--pendente">sugere {{ pr.data_sugerida|data_br }}{% if pr.horario_sugerido %} às {{ pr.horario_sugerido.strftime('%H:%M') }}{% endif %}</span>{% endif %}
+                  {% if pr.mensagem %}<p>“{{ pr.mensagem }}”</p>{% endif %}
+                </div>
+                {% if pr.status == 'enviada' and p.status in ['aberto', 'com_propostas'] %}
+                  <div class="acoes">
+                    <form action="{{ url_for('recusar_proposta', proposta_id=pr.id) }}" method="post">
+                      <button class="btn btn--ghost btn--small" type="submit">Recusar</button>
+                    </form>
+                    <form action="{{ url_for('aceitar_proposta', proposta_id=pr.id) }}" method="post">
+                      <button class="btn btn--accent btn--small" type="submit">Aceitar</button>
+                    </form>
+                  </div>
+                {% else %}
+                  <span class="status">{{ pr.status }}</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+            {% if not ns.tem %}<p class="hint">Aguardando propostas dos artistas.</p>{% endif %}
           </div>
         {% endfor %}
       </div>
